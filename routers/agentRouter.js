@@ -1,6 +1,7 @@
 import express from 'express'
 import { authentication } from '../middleware/authentication.js'
 import { readFile, writeFile } from '../utils/functions.js'
+import { checkKeys } from '../utils/functions.js'
 
 export const agentRouter = express()
 
@@ -25,7 +26,8 @@ agentRouter.get('/:id', async (req, res) => {
 
 agentRouter.post('/', authentication, async (req, res) =>{
     const newAgent = {}
-    if (req.body && req.body.id && req.body.name && req.body.nickname){
+    const keys = Object.keys(req.body)
+    if (req.body && req.body.id && req.body.name && req.body.nickname && keys.length === 3){
         const id = req.body.id
         const name = req.body.name
         const nickname = req.body.nickname
@@ -50,7 +52,9 @@ agentRouter.post('/', authentication, async (req, res) =>{
 agentRouter.put('/:id', authentication, async (req, res) => {
     const {id} = req.params
     const agents = await readFile(agentsFile)
-    if (req.body && (req.body.name || req.body.nickname)){
+    const possiblekeys = ['name', 'nickname']
+    const keys = Object.keys(req.body)
+    if (req.body && checkKeys(possiblekeys, keys)){
         const name = req.body.name
         const nickname = req.body.nickname
         for (const agent of agents) {

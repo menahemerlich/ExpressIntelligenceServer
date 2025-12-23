@@ -1,6 +1,7 @@
 import express from 'express'
 import { authentication } from '../middleware/authentication.js'
 import { readFile, writeFile } from '../utils/functions.js'
+import { checkKeys } from '../utils/functions.js'
 
 export const userRouter = express()
 userRouter.use(authentication)
@@ -14,7 +15,8 @@ userRouter.get('/', async (req, res)=> {
 
 userRouter.post('/', async (req, res) =>{
     const newUser = {}
-    if (req.body && req.body.username && req.body.password){
+    const keys = Object.keys(req.body)
+    if (req.body && req.body.username && req.body.password && keys.length === 2){
         const username = req.body.username
         const password = req.body.password
         const users = await readFile(usersFile)
@@ -27,7 +29,7 @@ userRouter.post('/', async (req, res) =>{
         newUser.password = password
         users.push(newUser)
         await writeFile(usersFile, users)
-        return res.status(200).send(`${username} Added successfully.`)
+        return res.status(200).send(`User: '${username}' Added successfully.`)
     } else {
         return res.status(422).send('Missing data')
     }
@@ -35,7 +37,9 @@ userRouter.post('/', async (req, res) =>{
 
 userRouter.put('/:username', async (req, res) => {
     const {username} = req.params
-    if (req.body && req.body.newPassword){
+    const possiblekeys = ['newPassword']
+    const keys = Object.keys(req.body)
+    if (req.body && checkKeys(possiblekeys, keys)){
         const users = await readFile(usersFile)
         const newPassword = req.body.newPassword
         for (const user of users) {

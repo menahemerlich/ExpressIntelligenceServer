@@ -29,3 +29,12 @@ export async function createFile(filePath){
         console.log(`${filePath} was creates.`);
     }
 }
+
+export function checkKeys(possiblekeys, keysList){
+    for (const key of keysList) {
+        if (!(possiblekeys.includes(key))){
+            return false
+        }
+    }
+    return true
+}

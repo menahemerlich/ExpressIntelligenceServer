@@ -1,6 +1,8 @@
 import express from 'express'
 import { authentication } from '../middleware/authentication.js'
 import { readFile, writeFile } from '../utils/functions.js'
+import { checkKeys } from '../utils/functions.js'
+
 
 export const reportRouter = express()
 
@@ -25,7 +27,8 @@ reportRouter.get('/:id', async (req, res) => {
 
 reportRouter.post('/', authentication, async (req, res) => {
     const newReport = {}
-    if (req.body && req.body.id && req.body.content && req.body.agentId){
+    const keys = Object.keys(req.body)
+    if (req.body && req.body.id && req.body.content && req.body.agentId && keys.length === 3){
         const id = req.body.id
         const content = req.body.content
         const agentId = req.body.agentId
@@ -58,7 +61,9 @@ reportRouter.post('/', authentication, async (req, res) => {
 reportRouter.put('/:id', authentication, async (req, res) => {
     const {id} = req.params
     const reports = await readFile(reportsFile)
-    if (req.body && req.body.content){
+    const possiblekeys = ['content']
+    const keys = Object.keys(req.body)
+    if (req.body && checkKeys(possiblekeys, keys)){
         const content = req.body.content
         for (const report of reports) {
             if (report.id == id){
