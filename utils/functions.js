@@ -23,7 +23,7 @@ export async function writeFile(fileName, data) {
 
 export async function createFile(filePath){
     if (fs.existsSync(filePath)){
-        console.log(`${filePath} is exists.`);
+        return true
     }else {
         await writeFile(filePath, [])
         console.log(`${filePath} was creates.`);
